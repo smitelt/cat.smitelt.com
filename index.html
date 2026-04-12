@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ভিক্টোরিয়া - একটি না-বলা ভালোবাসা</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    
+    <style>
+        /* --- CSS Variables & Resets --- */
+        :root {
+            --bg-color: #050505;
+            --text-main: #e0e0e0;
+            --accent-gold: #d4af37;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; 
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
+            -webkit-tap-highlight-color: transparent; /* Removes blue tap highlight */
+        }
+        body {
+            font-family: 'Anek Bangla', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            position: relative;
+        }
+
+        /* --- Custom Cursor --- */
+        .cursor-dot, .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .cursor-dot {
+            width: 35px;
+            height: 35px;
+            background-image: url('mouse-touch.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 0;
+        }
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ffb6c1; 
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+
+        /* --- Floating Particles Background (New Design) --- */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(212, 175, 55, 0.2);
+            border-radius: 50%;
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        /* --- Scroll Animations --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1.2s cubic-bezier(0.5, 0, 0, 1);
+            position: relative;
+            z-index: 2;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background-image: linear-gradient(rgba(5, 5, 5, 0.4), rgba(5, 5, 5, 0.8)), 
+                              url('photos/hero.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .hero-text {
+            text-align: center;
+            z-index: 2;
+        }
+        .hero h1 {
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #fff, var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            animation: pulseGlow 4s infinite alternate;
+        }
+        .hero p {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #ccc; 
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 20px rgba(212, 175, 55, 0.1); }
+            100% { text-shadow: 0 0 40px rgba(212, 175, 55, 0.5); }
+        }
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 50px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .scroll-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            margin-top: 10px;
+            animation: scrollDown 2s infinite;
+        }
+        @keyframes scrollDown {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(20px); opacity: 0; }
+        }
+
+        /* --- Container & Layout --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px;
+            position: relative;
+            z-index: 2;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 80px;
+            color: #fff;
+            position: relative;
+        }
+        .section-title span {
+            color: var(--accent-gold);
+        }
+
+        /* --- Memory Grid Section --- */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            position: relative;
+        }
+        .memory-card {
+            padding: 30px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            position: relative;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s;
+        }
+        .memory-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.15);
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+        .memory-card h3 {
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        /* --- Favorite Things Section --- */
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .fav-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), transparent);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            transition: 0.3s;
+        }
+        .fav-card:hover {
+            background: linear-gradient(145deg, rgba(212, 175, 55, 0.1), transparent);
+            transform: translateY(-5px);
+        }
+        .fav-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--accent-gold);
+        }
+        .fav-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        /* --- Infinite Horizontal Marquee Section --- */
+        .marquee-container {
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            overflow: hidden;
+            padding: 40px 0;
+            background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(212, 175, 55, 0.05), rgba(0,0,0,0.8));
+        }
+        .marquee-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .marquee-row {
+            display: flex;
+            width: max-content; 
+        }
+        
+        .scroll-left { animation: slide-left 80s linear infinite; }
+        .scroll-right { animation: slide-right 80s linear infinite; }
+        
+        .marquee-row:hover {
+            animation-play-state: paused;
+        }
+
+        .marquee-item {
+            width: 25vw; 
+            height: 280px;
+            padding: 0 10px;
+            flex-shrink: 0;
+        }
+        .marquee-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+            opacity: 0.6;
+            filter: grayscale(30%);
+            transition: all 0.4s ease;
+            border: 1px solid var(--glass-border);
+        }
+        .marquee-item:hover img {
+            opacity: 1;
+            filter: grayscale(0%);
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+            border-color: var(--accent-gold);
+            z-index: 10;
+            position: relative;
+        }
+
+        @keyframes slide-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        @keyframes slide-right {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+        }
+
+        /* --- Short Stories Section --- */
+        .story-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            position: relative;
+        }
+        .story-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+        .story-card:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.1);
+        }
+        .story-card h3 {
+            color: var(--accent-gold);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        .story-text {
+            color: #ccc;
+            line-height: 1.6;
+        }
+        .read-more-btn {
+            color: var(--accent-gold);
+            text-decoration: underline;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .story-full {
+            display: none;
+            margin-top: 10px;
+            color: #ccc;
+            line-height: 1.6;
+            animation: fadeIn 0.4s ease;
+        }
+        .story-full.active {
+            display: block;
+        }
+        .story-excerpt.hidden {
+            display: none;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Memory Box (New Section) --- */
+        .memory-box-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .memory-box-row {
+            display: flex;
+            flex-direction: row; /* Strict row layout for both PC and Mobile */
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        .memory-box-row:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.1);
+            transform: scale(1.01);
+        }
+        .memory-box-img {
+            flex: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 250px; /* Limit size for square */
+            width: 100%;
+        }
+        .memory-box-img img {
+            width: 100%;
+            height: 100%; /* Fill the container space */
+            aspect-ratio: 1 / 1; /* Key change: enforce perfect square shape */
+            object-fit: cover; /* Crucial: crop, don't stretch to fit square */
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            transition: transform 0.3s ease;
+        }
+        .memory-box-row:hover .memory-box-img img {
+            transform: scale(1.05);
+        }
+        .memory-box-text {
+            flex: 1;
+            padding: 10px 20px;
+        }
+        .memory-box-text h4 {
+            color: var(--accent-gold);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        .memory-box-text p {
+            color: #ccc;
+            line-height: 1.5;
+            font-size: 1rem;
+        }
+
+        /* --- 3D Gallery --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            perspective: 1000px;
+        }
+        .gallery-card {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s;
+        }
+        .gallery-card-inner {
+            width: 100%;
+            height: 100%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .gallery-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .gallery-card:hover img {
+            opacity: 1;
+            transform: scale(1.05) translateZ(20px);
+        }
+        .card-glare {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1), transparent);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .gallery-card:hover .card-glare { opacity: 1; }
+
+        /* --- Flower Tribute Section --- */
+        .tribute-section {
+            text-align: center;
+            padding: 150px 20px;
+            background: linear-gradient(to top, #000, var(--bg-color));
+            position: relative;
+            z-index: 2;
+        }
+        .flower-offering {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 50px auto;
+            max-width: 600px;
+            position: relative;
+            z-index: 10;
+        }
+        .flower-item {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+        }
+        .flower-item:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        
+        .flower-item img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+            transition: transform 0.3s;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3));
+        }
+        .flower-item:hover img {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .flower-msg {
+            margin-top: 30px;
+            font-size: 1.5rem;
+            opacity: 0;
+            transition: opacity 1s;
+            font-style: italic;
+            color: var(--accent-gold);
+        }
+
+        /* --- Realistic Physics Container --- */
+        #physics-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        .physics-flower {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            margin-left: -20px;
+            margin-top: -20px;
+            will-change: transform;
+        }
+        .physics-flower img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0px 5px 5px rgba(0,0,0,0.4));
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid var(--glass-border);
+            color: #666;
+            background: #000;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- Responsive --- */
+        @media screen and (max-width: 992px) {
+            .memory-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media screen and (max-width: 768px) {
+            .hero { background-position: 75% center; }
+            .memory-grid, .story-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 3rem; }
+            .section-title { font-size: 2.2rem; } 
+            .hero-text { padding: 0 20px; }
+            .flower-offering { gap: 15px; flex-wrap: wrap; }
+            .flower-item { width: 60px; height: 60px; }
+            .flower-item img { width: 35px; height: 35px; }
+            .marquee-item { width: 50vw; height: 200px; }
+            
+            /* Strict Side-by-Side rules for Memory Box on Mobile */
+            .memory-box-row {
+                flex-direction: row; 
+                gap: 10px;
+                padding: 10px;
+            }
+            .memory-box-text {
+                padding: 5px 10px;
+            }
+            .memory-box-text h4 {
+                font-size: 1.1rem;
+                margin-bottom: 5px;
+            }
+            .memory-box-text p {
+                font-size: 0.85rem;
+                line-height: 1.4;
+            }
+            .memory-box-img {
+                max-width: 120px; /* Scale down the square container on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="particles" id="particles"></div>
+
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
+
+    <div id="physics-canvas"></div>
+
+    <section class="hero">
+        <div class="hero-text reveal">
+            <h1>ভিক্টোরিয়া</h1>
+            <p>যে স্মৃতি কখনো মুছে যাওয়ার নয়...</p>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-dot"></div>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2 class="section-title reveal">যেভাবে মিশে আছো <span>স্মৃতিতে</span></h2>
+        <div class="memory-grid">
+            <div class="memory-card reveal">
+                <h3>প্রথম স্পর্শ</h3>
+                <p>যেদিন প্রথম তুমি এ বাড়িতে এলে, ছোট্ট শরীর, মায়াবী চোখ। একটু ভয়ে ভয়ে ছিলে, কিন্তু কয়েক ঘণ্টার মধ্যেই বুঝে নিয়েছিলে এই বাড়িটাই তোমার আপন ঠিকানা।</p>
+            </div>
+            <div class="memory-card reveal">
+                <h3>দুষ্টুমির প্রহর</h3>
+                <p>কাজের ফাঁকে ল্যাপটপের ওপর এসে বসে থাকা, আর আমার মনোযোগ কাড়ার সেই অদ্ভুত কৌশলগুলো। তোমার সেই ছোট ছোট দুষ্টুমিগুলোই আজ বড্ড বেশি মনে পড়ে।</p>
+            </div>
+            <div class="memory-card reveal">
+                <h3>নীরব অভিমান</h3>
+                <p>কখনো বকা দিলে চুপটি করে এক কোণে গিয়ে বসে থাকতে। যেন বলতে চাইতে, "আমি অভিমান করেছি, আমাকে আদর করে মানিয়ে নাও।" তোমার সেই নীরব ভাষা আমি ঠিক বুঝতাম।</p>
+            </div>
+            <div class="memory-card reveal">
+                <h3>ভালোবাসার কৌশল</h3>
+                <p>অবলা জীব হয়ে জানিনা কিভাবে তুমি  বুঝিয়ে দিতে যে কখন তোমার ভালোবাসা চায়,ঠিকই সময় মতো আদায় করে নিয়েছো স্নেহ।</p>
+            </div>
+			<div class="memory-card reveal">
+                <h3>সান্তনার প্রতীক</h3>
+                <p>তুমি ছিলে আমার সকল দুঃখ কষ্টে এক জলজ্যান্ত সান্ত্বনা,  এক নিমিষেই মুহূর্তের মধ্যে তুমি আমার সকল কষ্ট ভুলিয়ে দিতে।</p>
+            </div>
+			<div class="memory-card reveal">
+                <h3>না বলা কথা</h3>
+                <p>হয়তো মৃত্যুর আগ পর্যন্ত তোমার হৃদয় অনেক কথা জমে ছিলো, যা তোমার বলা হয়ে ওঠেনি। তুমি তো মুক্ত হয়ে চলে গেলে পৃথিবী থেকে, কষ্টের বোঝা আমার উপর চাপিয়ে দিয়ে।</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2 class="section-title reveal">ভিক্টোরিয়ার <span>প্রিয় জিনিস</span></h2>
+        <div class="favorites-grid reveal">
+            <div class="fav-card">
+                <div class="fav-icon">🧶</div>
+                <h4>ছোট বল</h4>
+                <p>দড়ি বাধা প্লাস্টিকের বল নিয়ে দৌড়াদৌড়ি করা ছিল তোমার প্রিয় খেলা।</p>
+            </div>
+            <div class="fav-card">
+                <div class="fav-icon">🐟</div>
+                <h4>মাছের ঘ্রাণ</h4>
+                <p>রান্নাঘর থেকে মাছের গন্ধ পেলেই চুপিসারে হাজির হওয়া।</p>
+            </div>
+            <div class="fav-card">
+                <div class="fav-icon">🪟</div>
+                <h4>জানালার ধার</h4>
+                <p>টেবিলের ওপর শুয়ে একদৃষ্টিতে পাখি ও প্রজাপতি দেখা।</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="container" style="padding-top: 50px;">
+        <h2 class="section-title reveal">স্মৃতির <span>সরণি</span></h2>
+        
+        
+        <div class="marquee-container reveal">
+            <div class="marquee-wrapper">
+                
+                <div class="marquee-row scroll-left">
+                    <div class="marquee-item"><img src="photos/1.jpg" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/2.jpg" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/3.jpg" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/4.jpg" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/5.jpg" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/6.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/7.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/8.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/9.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/10.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/11.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/12.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/13.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/14.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/15.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/16.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/17.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/18.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/19.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/20.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/21.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/22.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/23.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/24.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/25.jpg" alt="Pet"></div>
+                </div>
+
+                <div class="marquee-row scroll-right">
+                    <div class="marquee-item"><img src="photos/26.jpg" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/27.jpg" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/28.jpg" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/29.jpg" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/30.jpg" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/31.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/32.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/33.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/34.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/35.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/36.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/37.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/38.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/39.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/40.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/41.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/42.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/43.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/44.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/45.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/46.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/47.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/48.jpg" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/49.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/50.png" alt="Pet"></div>
+                </div>
+
+                <div class="marquee-row scroll-left">
+                    <div class="marquee-item"><img src="photos/51.png" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/52.png" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/53.png" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/54.png" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/55.png" alt="Pet"></div>
+                    <div class="marquee-item"><img src="photos/56.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/57.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/58.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/59.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/60.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/61.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/62.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/63.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/64.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/65.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/66.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/67.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/68.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/69.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/70.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/71.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/72.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/73.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/74.png" alt="Pet"></div>
+					<div class="marquee-item"><img src="photos/75.png" alt="Pet"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container" id="memory-box">
+        <h2 class="section-title reveal">স্মৃতির <span>বাক্স</span></h2>
+        
+        <div class="memory-box-wrapper">
+            <div class="memory-box-row reveal">
+                <div class="memory-box-img">
+                    <img src="photos/79.jpeg" alt="Victoria Memory">
+                </div>
+                <div class="memory-box-text">
+                    <h4>এক থলি স্মৃতি</h4>
+                    <p>সাদাকালো এই ছোট্ট থলিটার ভিতরে আছে রঙিন অনেক স্মৃতি। এই থলিটার ভেতরের প্রতিটা জিনিস স্পর্শ করে আমি অনুভব করতে পারি আমার লক্ষ্মী বিড়ালটাকে। তার সাথে সবথেকে বেশি যুক্ত ছিল এমন কিছু জিনিস রেখেছি আমি এই থলির মধ্যে। সারা জীবন এটাকে আমি আগলে রাখতে চাই।</p>
+                </div>
+            </div>
+
+            <div class="memory-box-row reveal">
+                <div class="memory-box-text">
+                    <h4>মাছের আবদার</h4>
+                    <p>এই হলুদ পাত্রে আমার ভিক্টোরিয়া প্রথম যখন আমাদের বাড়ি এসেছিল তখন থেকেই খাবার খেতো, ওর সব থেকে বেশি স্পর্শ এবং ভালোবাসা হয়তো এই পাত্রে ছিল তাই এটাকে ফেলে না দিয়ে আমি একটি নতুন রূপ দেওয়ার চেষ্টা করেছি। কখনো যদি এমন হতো, আমি ওর মাছ ভাত মাখাচ্ছি এবং আমার একটু দেরি হচ্ছে ও পাত্র ধরে দুই পায়ে দাঁড়িয়ে পড়তো।</p>
+                </div>
+                <div class="memory-box-img">
+                    <img src="photos/80.jpeg" alt="Victoria Memory">
+                </div>
+            </div>
+
+            <div class="memory-box-row reveal">
+                <div class="memory-box-img">
+                    <img src="photos/81.jpeg" alt="Victoria Memory">
+                </div>
+                <div class="memory-box-text">
+                    <h4>স্মৃতির চরকি</h4>
+                    <p>অনেকের চেনা এই শৈশবের খেলনাটি আমার লক্ষ্মী পাখি বিড়ালেরও প্রিয় খেলনা ছিল, আমার খাটের পায়ার দিকে এটা রাখা ছিল, যখনই বাতাসে ঘুরত আমার ভিক্টোরিয়া এটাকে আটকানোর চেষ্টা করত। এর রঙিন রঙিন পাখাগুলো হয়তো ওর ছোট মনকে আকৃষ্ট করতো।</p>
+                </div>
+            </div>
+
+            <div class="memory-box-row reveal">
+                <div class="memory-box-text">
+                    <h4>ব্যর্থ ভরসা</h4>
+                    <p>শেষবার ভিক্টোরিয়াকে হসপিটালে নেওয়ার পরের প্রেসক্রিপশন এবং ঔষধ, আমি যত্ন করে রেখে দিয়েছি। ওকে আপন করে রেখে দেওয়ার শেষ ভরসা ছিল এই প্রেসক্রিপশন। কিন্তু রাত না পেরোতেই আমি বুঝে গিয়েছিলাম এই শেষ ভরসা আর কোন কাজে দিবে না। হারাতেই যে হবে আমার ভিক্টোরিয়াকে।</p>
+                </div>
+                <div class="memory-box-img">
+                    <img src="photos/82.jpeg" alt="Victoria Memory">
+                </div>
+            </div>
+
+            <div class="memory-box-row reveal">
+                <div class="memory-box-img">
+                    <img src="photos/83.jpeg" alt="Victoria Memory">
+                </div>
+                <div class="memory-box-text">
+                    <h4>শেষ লড়াই</h4>
+                    <p>এই ড্রপার এবং সিরিন্জ এর সাথে মিশে আছে আমার ভিক্টোরিয়ার অনেক অনেক কষ্ট ও ধৈর্য। হয়তো ভিক্টোরিয়া জানতো যে এগুলো ব্যবহার করতে কষ্ট হচ্ছে কিন্তু এই কষ্টের পর আছে ওর শান্তি ও দীর্ঘায়ু। কিন্তু বাস্তবতা ছিল ভিন্ন। দীর্ঘায়ু নয় বরং ওর ভাগ্যে লেখা ছিল চির মুক্তি</p>
+                </div>
+            </div>
+
+            <div class="memory-box-row reveal">
+                <div class="memory-box-text">
+                    <h4>চঞ্চল স্মৃতি</h4>
+                    <p>এই প্লাস্টিকের ছোট বলটি ছিল ভিক্টোরিয়ার অত্যন্ত প্রিয় খেলনা। এটা সব সময় আমার স্বামীর কম্পিউটার টেবিলের চেয়ার এর পেছনে বাঁধা থাকতো। লম্বা দড়ি হাওয়াই এটা ঝুলে বেড়াতো। আর ভিক্টোরিয়া অত্যন্ত আনন্দের সাথে এটা নিয়ে অনেক বেশি লাফালাফি ও মারামারি করতো। কখনো কখনো বল বাদ দিয়ে আমার স্বামীর পা টা ধরে কামড়াকামড়ি শুরু করতো। মাঝে মাঝে এই বল নিয়ে উঠানে খুব দৌড়াদৌড়ি করে খেলা করতো।</p>
+                </div>
+                <div class="memory-box-img">
+                    <img src="photos/84.jpeg" alt="Victoria Memory">
+                </div>
+            </div>
+
+            <div class="memory-box-row reveal">
+                <div class="memory-box-img">
+                    <img src="photos/85.jpeg" alt="Victoria Memory">
+                </div>
+                <div class="memory-box-text">
+                    <h4>চিরচেনা ঝংকার</h4>
+                    <p>এই ঝুনঝুনি টা নিয়ে বলতে চাইলে অনেক কিছু বলা যাবে। অনেক পুরনো হয়ে যাওয়া ঝুনঝুনিটির মূল্য আমার কাছে অসীম, কারণ মৃত্যুর আগের দিন পর্যন্ত এটি আমার প্রিয় বিড়ালের গলাই ছিল। এখনো, যখনই এই ঝুনঝুনির আওয়াজ কানে আসছে, মচর দিয়ে উঠছে হৃদয়ের ভিতর। ওই বুঝি আমার ছোট্ট বিড়ালটা দৌড়ে আসছে।</p>
+                </div>
+            </div>
+
+            <div class="memory-box-row reveal">
+                <div class="memory-box-text">
+                    <h4>ছোট্ট উষ্ণতা</h4>
+                    <p>আমার ভিক্টোরিয়ার জামা। এই জামাটা আমার ময়না পাখিকে তৈরি করে দিয়েছিল ওর খালামনি। শীতের মধ্যে এই জামাটা বহুবার পড়েছে ও। প্রায় সব সময় ওর গায়ে থাকতো। তবে শেষের দিকে এসে আমার বিড়ালটা একটু বড় হয়ে যাওয়াতে এটা ওর গায়ে ছোট গেঞ্জির মত হয়ে গিয়েছিল। তবে পড়লে খুব কিউট দেখা যেত।</p>
+                </div>
+                <div class="memory-box-img">
+                    <img src="photos/86.jpeg" alt="Victoria Memory">
+                </div>
+            </div>
+
+            <div class="memory-box-row reveal">
+                <div class="memory-box-img">
+                    <img src="photos/87.jpeg" alt="Victoria Memory">
+                </div>
+                <div class="memory-box-text">
+                    <h4>জোড়া শূন্যতা</h4>
+                    <p>আমার ভিক্টোরিয়ার একটি প্রিয় বন্ধু ছিল। সে হলো জ্যাক, আমার পোষা কুকুর। তবে খেলার চেয়ে বেশি হতো মারামারি। অল্প কিছুদিন আগে আমি জ্যাক কেও হারিয়েছি। আমার ভিক্টোরিয়া জ্যাকের সাথে প্রায়ই হিংসামি করত। হয়তো ও চাইত সব আমার আমি নিব। তবে জ্যাক ছিল খুবই দয়ালু।</p>
+                </div>
+            </div>
+
+            <div class="memory-box-row reveal">
+                <div class="memory-box-text">
+                    <h4>দুষ্টু পাখি</h4>
+                    <p>আমার পাখি বিড়ালের সবার কাঁধে উঠে পাখি সেজে বসে থাকার একটি দৃশ্য। এই অভ্যাসের কারণে ওর নাম হয়ে গিয়েছিল পাখি। আমার স্বামী যখনই কম্পিউটারে কাজ করতে বসতো ওইভাবে কাঁধে উঠে বসে থাকতো। কিংবা আমার শ্বশুর যদি একটু রোদে বসত তার কাধেও একইভাবে উঠে বসে থাকতো।</p>
+                </div>
+                <div class="memory-box-img">
+                    <img src="photos/88.jpeg" alt="Victoria Memory">
+                </div>
+            </div>
+
+            
+        </div>
+    </section>
+
+    <section class="container">
+        <h2 class="section-title reveal">অব্যক্ত <span>গল্পগুলো</span></h2>
+        <div class="story-grid">
+            
+            <div class="story-card reveal">
+                <h3>নির্দিষ্ট পরিচয়</h3>
+                <div class="story-content">
+                    <p class="story-text story-excerpt">ভিক্টোরিয়া আসলে একটা ছেলে বিড়াল, সোনা টা কে অনেক ছোট্ট বেলায় এনেছিলাম তখন আসলে বুঝিনি যে ও ছেলে নাকি মেয়ে... <span class="read-more-btn" onclick="toggleStory(this)">আরও পড়ুন</span></p>
+                    <div class="story-full">
+                        <p>ভিক্টোরিয়া আসলে একটা ছেলে বিড়াল, সোনা টা কে অনেক ছোট্ট বেলায় এনেছিলাম তখন আসলে বুঝিনি যে ও ছেলে নাকি মেয়ে, তবে ওর সুন্দরর্য দেখে নাম রেখেছিলাম ভিক্টোরিয়া, পরে আস্তে আস্তে বুঝলাম যে ও আসলে ভিক্টোরিয়া না বরং ও ভেক্টর,,, কিন্তু আমি নাম পরিবর্তন করিনি কারণ ঔ নামে মিশে গেছিলো ভালোবাসা, অনুভূতি,টান, ঔ নাম টা খুব প্রিয় হয়ে গেছিলো আমাদের সকলের কাছে, মন চাইছিলো না যে নাম টা আর পরিবর্তন করি, তাই আমার ময়না পাখিটা ভিক্টোরিয়া হয়েই থেকে গেলো।</p>
+                        <span class="read-more-btn" onclick="toggleStory(this)">সংক্ষিপ্ত করুন</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="story-card reveal">
+                <h3>হারিয়ে যাওয়ার দিন</h3>
+                <div class="story-content">
+                    <p class="story-text story-excerpt">দিন টা ছিলো আমার দেবর এর জন্মদিন, সন্ধ্যায় আমি আর আমার হাসবেন্ড ওদের বাড়ি যায়, শীতের সন্ধ্যা, পাশাপাশিই বাড়ি... <span class="read-more-btn" onclick="toggleStory(this)">আরও পড়ুন</span></p>
+                    <div class="story-full">
+                        <p>দিন টা ছিলো আমার দেবর এর জন্মদিন, সন্ধ্যায় আমি আর আমার হাসবেন্ড ওদের বাড়ি যায়, শীতের সন্ধ্যা, পাশাপাশিই বাড়ি, আমার ভিক্টোরিয়া ছিলো খুবই ছোট, ওই সময় ও বাড়ির বাইরে যাওয়া বুঝতো না, আমার শাশুড়ী ছিলো বাড়িতে, কিছু সময় পর সে ও যায় জন্মদিনে, হঠাৎ কি মনে হলো আমি বাড়ি আসলাম, এসে দেখি ছোট্ট বাবু বিড়ালটা আমার নেই, সামান্য কিছু সময় আগেই আবার কুকুরে জোরে ঘেউ ঘেউ শব্দ শুনেছিলাম, বুকের মধ্য মোচড় দিয়ে উঠলো, আমি তো কান্না শুরু আর আমার স্বামী হয়তো পুরুষ তাই কাদতে পারিনি, তবে আমি, সে, আমার শ্বশুর শাশুড়ী, চাচী শাশুরি সবাই ঘর বাড়ি সহ পুরো এলাকা তন্ন তন্ন করেছিলাম আর ধরে নিয়ে ছিলাম ভিক্টোরিয়াকে কুকুর খেয়ে নিয়েছে, কেদে আমার চোখ ফুলে গেছিলো, আমার স্বামী একবার আমাকে থামানোর চেষ্টা করছিলো একবার ওকে খুজছিলে, বেশ খানিকক্ষণ পর আমার চাচাতো ননদ এসে আমার রুম এর কম্বলের ভাজ টা সম্পূর্ণ খোলে আার দেখে ও মাঝে ঢুকে আরামে ঘুমাচ্ছে, ওকে পাওয়ার পর খুশিতে ওকে জরিয়ে ধরে আমি আরো একবার কান্না করি, আনন্দের কান্না, তারপর খুশি খুশি দেবরের জন্মদিনে যোগ দিই।</p>
+                        <span class="read-more-btn" onclick="toggleStory(this)">সংক্ষিপ্ত করুন</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="story-card reveal">
+                <h3>বিড়াল থেকে পাখি</h3>
+                <div class="story-content">
+                    <p class="story-text story-excerpt">ভিক্টোরিয়া যখন অনেক ছোট তখন আমি ওকে এনেছি, ও নিজে খাবার খাওয়াও বুঝতো না, আর সেই ছোট্টবেলা থেকেই আমার সোনা... <span class="read-more-btn" onclick="toggleStory(this)">আরও পড়ুন</span></p>
+                    <div class="story-full">
+                        <p>ভিক্টোরিয়া যখন অনেক ছোট তখন আমি ওকে এনেছি, ও নিজে খাবার খাওয়াও বুঝতো না, আর সেই ছোট্টবেলা থেকেই আমার সোনা পাখি বিড়ালটা প্রচন্ড চঞ্চল, সাধারণত সকল বিড়াল তার পছন্দের মানুষের কোলের মধ্যে বসতে ভালোবাসে, কিন্তু ভিক্টোরিয়া ছিল একদমই ভিন্ন প্রকৃতির, সে তার পছন্দের মানুষদের কাঁধে উঠে বসতো। ঠিক যেমন করে টিয়া পাখি তার মালিকের কাঁধে বসে থাকে একদম হুবহু ওইভাবে। আমার শ্বশুরের কাছে শাশুড়ির কাঁধে আমার স্বামীর কাঁধে এমন কি আমার কাঁধে একইভাবে উঠে বসে থাকতো, এছাড়াও ওর আরো একজন প্রিয় মানুষ ছিল আমার চাচী শাশুড়ি আর কাঁধেও সে একইভাবে পাখির মতো করে বসে থাকতো সেখান থেকেই আমার ভিক্টোরিয়ার নতুন নাম হয় (সোনা পাখি বিড়াল, টিয়া পাখি)।</p>
+                        <span class="read-more-btn" onclick="toggleStory(this)">সংক্ষিপ্ত করুন</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="story-card reveal">
+                <h3>ব্যাঙের সাথে যুদ্ধ</h3>
+                <div class="story-content">
+                    <p class="story-text story-excerpt">এই দিন বিকাল বেলায় আমি আমার এক ছোট দেবরকে পড়াচ্ছিলাম, হঠাৎ সামনের দিক তাকিয়ে দেখি ভিক্টোরিয়া মুখে করে কিছু একটা... <span class="read-more-btn" onclick="toggleStory(this)">আরও পড়ুন</span></p>
+                    <div class="story-full">
+                        <p>এই দিন বিকাল বেলায় আমি আমার এক ছোট দেবরকে পড়াচ্ছিলাম, হঠাৎ সামনের দিক তাকিয়ে দেখি ভিক্টোরিয়া মুখে করে কিছু একটা নিয়ে আমার দিকে দৌড়ে আসছে, প্রথমে ভাবলাম টিকটিকি, তাই ভয় পেয়ে আমি আমার স্বামীকে ডাক দিলাম যেন ছাড়িয়ে দেয়, কারন আমার খুব ভয় করতো যদি কোন ভাবে ভিক্টোরিয়া কিছু খেতে গিয়ে বিস্ক্রিয়া হয়ে যায়,, যাইহোক ও আরো আমার কাছে আসতে বেশি ভয় পেয়ে গেলাম কারণ ওর মুখে টিকটিকি না বরং ছিল এক বিষাক্ত ব্যাঙ, সাথে সাথে আমি চিৎকার শুরু করে দিই এবং খুব কষ্ট করে ওর মুখ থেকে ব্যাঙটাকে ছাড়ানো হয়, তবে সাথে সাথে ভিক্টোরিয়ার মুখ দিয়ে প্রচুর পরিমাণ লালা ঝরতে শুরু করে, এবং গাল বন্ধ করতে পারছিল না, এটা দেখে আমি খুবই ভয় পেয়ে যাই এবং কান্নাকাটি শুরু করি কারণ তখন ও খুবই ছোট ছিল, তারপর AI এর সাহায্যে কিছু পরামর্শ নিই এবং আমার স্বামী আর আমি ওর মুখে প্রচুর পরিমাণ পানি দেওয়া শুরু করি এভাবে ওর মুখটা প্রায় দশ মিনিট ধরে ধোঁয়াতে থাকি, তারপর আল্লাহর অশেষ রহমতে অসুস্থ হয়ে যাই, এরপর থেকে আমি ওকে আরো বেশি বেশি দেখে রাখতাম যেন কখনো কোন পোকামাকড় বা ব্যাঙ মুখে না নেই। তাছাড়াও ভিক্টোরিয়া খুবই বুদ্ধিমান ছিল, এই দিনের পর থেকে ব্যাঙ দেখলে ও হাত দিয়ে ধাক্কা দিয়ে খেলা করতো তবে কখনো আর মুখে নেয়নি।</p>
+                        <span class="read-more-btn" onclick="toggleStory(this)">সংক্ষিপ্ত করুন</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="story-card reveal">
+                <h3>মায়ার স্পর্শ</h3>
+                <div class="story-content">
+                    <p class="story-text story-excerpt">কনকনে শীতের দিন আমি কলেজ থেকে বাড়ি ফিরলাম, সেদিন বাড়ি ফিরতে আমার বেশি একটু দেরি হয়েছিল, এবং আমার স্বামী ও সেদিন... <span class="read-more-btn" onclick="toggleStory(this)">আরও পড়ুন</span></p>
+                    <div class="story-full">
+                        <p>কনকনে শীতের দিন আমি কলেজ থেকে বাড়ি ফিরলাম, সেদিন বাড়ি ফিরতে আমার বেশি একটু দেরি হয়েছিল, এবং আমার স্বামী ও সেদিন কলেজে গিয়েছিল। ভিক্টোরিয়া তখন খুবই ছোট তাই ওকে ঘরের মধ্যে রেখে আমরা দরজা লাগিয়ে কলেজে গিয়েছিলাম যেন বাইরের কোনো বড় বিড়াল বা কুকুর ওকে ধরতে না পারে। কলেজ ছুটির সাথে সাথে আমি তাড়াহুড়ো করে বাড়ি ফিরলাম এবং ঘরে ঢুকতেই চোখে পড়ল আমার প্রিয় বিড়ালটা খুবই উদাসীন হয়ে বসে আছে সকালবেলায় খুলে রেখে যাওয়া আমার কাপড়চোপড় এবং সোয়েটারের উপরে। অনেকবারই শুনেছি যে প্রিয় মানুষের অভাব তার চিরচেনা শরীরের গন্ধ পূরণ করতে পারে। ঐদিন আমি তার প্রমাণ পেয়েছিলাম।</p>
+                        <span class="read-more-btn" onclick="toggleStory(this)">সংক্ষিপ্ত করুন</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="story-card reveal">
+                <h3>অস্বাভাবিক ঘুম</h3>
+                <div class="story-content">
+                    <p class="story-text story-excerpt">পরিবেশটা এত সুন্দর ছিল যে কারোর খুবই শান্তির ঘুম আসাটা স্বাভাবিক, না গরম না শীত। তাই আমি খাটে ঘুমাচ্ছিলাম। ভিক্টোরিয়া আমার... <span class="read-more-btn" onclick="toggleStory(this)">আরও পড়ুন</span></p>
+                    <div class="story-full">
+                        <p>পরিবেশটা এত সুন্দর ছিল যে কারোর খুবই শান্তির ঘুম আসাটা স্বাভাবিক, না গরম না শীত। তাই আমি খাটে ঘুমাচ্ছিলাম। ভিক্টোরিয়া আমার খাটের কোনায় রাখা কম্বলের উপর গা মিলিয়ে দিয়ে শুয়ে ঘুমাচ্ছিল, তবে ওর ঘুমানোর পজিশনটা ছিল খুবই ইউনিক। এবং এত বেশি গভীর ঘুম দিয়েছিল যে ওর চোখ কিছুটা খুলে ছিল, ওকে এমন অবস্থায় এলোমেলো ভাবে পড়ে থাকতে দেখে আমার কেমন যেন খটকা লাগে। আমি ওকে খুব জোরে জোরে নাড়াাতে থাকি এবং নাম ধরে ডাকতে থাকি কিন্তু ভিক্টোরিয়া নাড়াচাড়া করছিল না এমনকি চোখ খুলে তাকাচ্ছিলো না। আমি ভয় পেয়ে আমার শাশুড়িকে ডাক দিই, তারপর সে এসে তড়িঘড়ি করে ওকে একদম সোজা করে দাঁড় করিয়ে দেয়। তারপর দুষ্টু বিড়ালটার হুশ ফিরে, সেদিন যে পরিমাণ ভয় পেয়েছিলাম ঠিক সেই পরিমাণ হেসেছিলাম আমি।</p>
+                        <span class="read-more-btn" onclick="toggleStory(this)">সংক্ষিপ্ত করুন</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="story-card reveal" style="grid-column: span 1;">
+                <h3>ঝড়ের রাত</h3>
+                <div class="story-content">
+                    <p class="story-text story-excerpt">সেদিন রাতে খুব ঝড় উঠেছিল, বাইরে উথাল পাথাল বাতাস হচ্ছিল, আমি একা ছিলাম আন্ধকার বাড়িতে ফোনের ছোট্ট আলো নিয়ে, এমন অবস্থায়... <span class="read-more-btn" onclick="toggleStory(this)">আরও পড়ুন</span></p>
+                    <div class="story-full">
+                        <p>সেদিন রাতে খুব ঝড় উঠেছিল, বাইরে উথাল পাথাল বাতাস হচ্ছিল, আমি একা ছিলাম আন্ধকার বাড়িতে ফোনের ছোট্ট আলো নিয়ে, এমন অবস্থায় আমার ভিক্টোরিয়া বাইরে যাওয়ার জন্য খুব দৌড়াদৌড়ি করছিল কারন সেই ঝড়ো হাওয়ায় তার হয়তো ভীষণ খেলা করতে মন চাইছিল, কিন্তু এমন ঝড়ো হওয়ার মধ্যে আমি তো তাকে বের হতে দিবই না কারণ তাকে হারানোর যে ভীষণ ভয় আমার, তাই ভিক্টোরিয়াকে আমার ঘরে রেখে আমি ঘরের দরজা বাইরে থেকে বন্ধ করে বারান্দায় বসে ঝড় দেখছিলাম, আর একটু পরপর কানি পেতে ঘরের ভেতরে ওর গলার ঝুনঝুনির আওয়াজ শুনছিলাম, হঠাৎ করে দেখি সেই ঝুনঝুনির আওয়াজ বাইরে ঝড় হওয়ার ভেতর থেকে আসছে, আমি একদম থমকে গিয়ে খুব ভয় পাচ্ছিলাম, কারণ আমার ময়না বিড়ালকে আমি নিজ হাতে ঘরে রেখে একটু পর পর ওর আওয়াজ শুনছি, তারপর হঠাৎ করে দেখি ভিক্টোরিয়া লাফ দিয়ে উঠে আসলো বারান্দার পাচিলের উপরে আর আমি ভয়ে তরিঘরি করে ঘরের দরজা খুলে দেখলাম যে ও যদি ঘরেই থাকবে তবে এই বিড়াল কে? রুমের দরজা খুলতেই আমি হতবাক, যে ও নিজে জানালা ঠেলা দিয়ে খুলে বের হয়েছে, এবং বাড়ির পেছন দিক দিয়ে ঘুরে বারান্দায় এসেছে, সে দিন বুঝলাম যে ও খুবই শিক্ষিত, তারপর ওকে কোলে নিয়ে বসে ঝড় দেখলাম।</p>
+                        <span class="read-more-btn" onclick="toggleStory(this)">সংক্ষিপ্ত করুন</span>
+                    </div>
+                </div>
+            </div>
+			
+			<div class="story-card reveal" style="grid-column: span 1;">
+                <h3>বুদ্ধিমানের পরিচয়</h3>
+                <div class="story-content">
+                    <p class="story-text story-excerpt">এটা ছিল ওর মৃত্যুর আগে শেষ বেড়াতে যাওয়া। সেদিন আমি বাড়ি থেকে একবারে তৈরি হয়ে বের হয়েছিলাম আমার মামাশ্বশুর বাড়ি থেকে দাওয়াত খেয়ে ওখান থেকে... <span class="read-more-btn" onclick="toggleStory(this)">আরও পড়ুন</span></p>
+                    <div class="story-full">
+                        <p>এটা ছিল ওর মৃত্যুর আগে শেষ বেড়াতে যাওয়া। সেদিন আমি বাড়ি থেকে একবারে তৈরি হয়ে বের হয়েছিলাম আমার মামাশ্বশুর বাড়ি থেকে দাওয়াত খেয়ে ওখান থেকে একবারে আমি আমার বাবার বাড়িতে যাব তাই, এজন্য বাস্কেটে করে আমার ভিক্টোরিয়া কে ও সাথে নেই আমি। বেশ অনেকটা রাস্তা তাই তাদের বাড়িতে যে আমি ওকে বাস্কেট থেকে বের করি যাতে ও একটু হাঁটাচলা করতে পারে, তখন জানতে পারলাম যে আমার মামা শশুর বাড়ির কেউই বিড়াল পছন্দ করেনা। তখন আমি ওকে আবার বাস্কেটে দিয়ে দিলাম। কিন্তু ও ভিতরে চিৎকার করছিল। দেখে খুব খারাপ লাগছিল তাই একটা রুমে যেয়ে দরজা লাগিয়ে ওকে আবার বের করলাম। তখন ওকে কোলে নিয়ে আমি বেশ অনেকটা আদর করেছিলাম। এবং ওকে বুঝিয়ে বলেছিলাম ❝ভিক্টোরিয়া আমার সোনা বিড়াল তুমি চিলাপাল্লা কোরো না, এখানে কেউ তোমাকে পছন্দ করে না, এখান থেকে কোনরকম দুপুরের খাবারটা খেয়ে তোমাকে নিয়ে আমি চলে যাব আমাদের বাড়ি। তখন তুমি যত ইচ্ছা খেলা করবে। এখন আর চিল্লাপাল্লা করো না তাহলে সবাই রাগ করবে, যাও আমার লক্ষ্মী বিড়াল তুমি বাস্কেটে থাকো❞ অবাক কান্ড হলো এই কথা বলে ওকে বাস্কেটে দেওয়ার পর ও আর একবারের জন্য চিৎকার চেঁচামেচি করেনি, সেখান থেকে আমরা দুপুরে খেলাম এবং বাড়ি যাওয়া পর্যন্ত কখনো একবারও আওয়াজ করেনি লক্ষী সোনার মত ভিতরে বসেছিল এবং বাস্কেটের ফাঁকা দিয়ে বাইরের দৃশ্য দেখছিল। ঐদিন আমি বুঝতে পেরেছিলাম যে আমার লক্ষী সোনা বিড়ালটা কতটা বুঝবান।</p>
+                        <span class="read-more-btn" onclick="toggleStory(this)">সংক্ষিপ্ত করুন</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="container">
+        <h2 class="section-title reveal">অমলিন <span>মুহূর্তগুলো</span></h2>
+        <div class="gallery-grid">
+            <div class="gallery-card reveal" data-tilt>
+                <div class="gallery-card-inner">
+                    <img src="photos/76.png" alt="Victoria">
+                    <div class="card-glare"></div>
+                </div>
+            </div>
+            <div class="gallery-card reveal" data-tilt>
+                <div class="gallery-card-inner">
+                    <img src="photos/77.png" alt="Victoria">
+                    <div class="card-glare"></div>
+                </div>
+            </div>
+            <div class="gallery-card reveal" data-tilt>
+                <div class="gallery-card-inner">
+                    <img src="photos/78.jpeg" alt="Victoria">
+                    <div class="card-glare"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tribute-section reveal">
+        <h2 class="section-title" style="margin-bottom: 20px;">শান্তির <span>প্রার্থনা</span></h2>
+        <p style="color: #aaa; margin-bottom: 40px;">ভিক্টোরিয়ার স্মৃতির উদ্দেশ্যে একটি ফুল অর্পণ করুন</p>
+        
+        <div class="flower-offering">
+            <div class="flower-item" title="রজনীগন্ধা" data-flower-type="lily">
+                <img src="1.png" alt="রজনীগন্ধা">
+            </div>
+            <div class="flower-item" title="গোলাপ" data-flower-type="rose">
+                <img src="2.png" alt="গোলাপ">
+            </div>
+            <div class="flower-item" title="শিউলি" data-flower-type="jasmine">
+                <img src="3.png" alt="শিউলি">
+            </div>
+        </div>
+
+        <div class="flower-msg" id="flowerMsg">"ভালোবাসা অবিরাম, ভিক্টোরিয়া..."</div>
+    </section>
+
+    <footer>
+        <p>তৈরি করা হয়েছে ভিক্টোরিয়ার প্রতি অফুরন্ত ভালোবাসা নিয়ে &copy; ২০২৬</p>
+    </footer>
+
+    <script>
+        // ==========================================
+        // WEB AUDIO API: PERFECT CROSSFADE LOOP 
+        // ==========================================
+        let audioCtx;
+        let audioBuffer;
+        let isAudioPlaying = false;
+        const FADE_TIME = 3; 
+
+        async function loadAudioBuffer() {
+            try {
+                const response = await fetch('love.mp3');
+                const arrayBuffer = await response.arrayBuffer();
+                audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                return true;
+            } catch (error) {
+                console.error("Audio Fetch/Decode Error:", error);
+                return false;
+            }
+        }
+
+        function playBufferAtTime(startTime) {
+            const source = audioCtx.createBufferSource();
+            source.buffer = audioBuffer;
+
+            const gainNode = audioCtx.createGain();
+            
+            gainNode.gain.setValueAtTime(0, startTime);
+            gainNode.gain.linearRampToValueAtTime(1.0, startTime + FADE_TIME);
+            
+            const endTime = startTime + audioBuffer.duration;
+            gainNode.gain.setValueAtTime(1.0, endTime - FADE_TIME);
+            gainNode.gain.linearRampToValueAtTime(0, endTime);
+
+            source.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            source.start(startTime);
+
+            const nextStartTime = endTime - FADE_TIME;
+            setTimeout(() => {
+                playBufferAtTime(nextStartTime);
+            }, (nextStartTime - audioCtx.currentTime) * 1000 - 500); 
+        }
+
+        async function initAudio() {
+            if (isAudioPlaying) return;
+
+            try {
+                if (!audioCtx) {
+                    const windowAudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new windowAudioContext();
+                }
+
+                if (audioCtx.state === 'suspended') {
+                    await audioCtx.resume();
+                }
+                
+                if (audioCtx.state === 'suspended') return;
+
+                isAudioPlaying = true; 
+
+                if (!audioBuffer) {
+                    const loaded = await loadAudioBuffer();
+                    if(!loaded) {
+                        isAudioPlaying = false;
+                        return;
+                    }
+                }
+
+                playBufferAtTime(audioCtx.currentTime);
+
+                const interactionEvents = ["click", "keydown", "touchstart"];
+                interactionEvents.forEach(evt => window.removeEventListener(evt, initAudio));
+                
+            } catch (error) {
+                console.error("Audio System Error:", error);
+                isAudioPlaying = false;
+            }
+        }
+
+        const interactionEvents = ["click", "keydown", "touchstart"];
+        interactionEvents.forEach(evt => window.addEventListener(evt, initAudio));
+
+
+        // ==========================================
+        // BACKGROUND PARTICLES LOGIC
+        // ==========================================
+        const particleContainer = document.getElementById('particles');
+        for(let i=0; i<30; i++) {
+            let p = document.createElement('div');
+            p.className = 'particle';
+            p.style.width = Math.random() * 5 + 2 + 'px';
+            p.style.height = p.style.width;
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDuration = Math.random() * 10 + 10 + 's';
+            p.style.animationDelay = Math.random() * 10 + 's';
+            particleContainer.appendChild(p);
+        }
+
+        // ==========================================
+        // CUSTOM CURSOR LOGIC
+        // ==========================================
+        const dot = document.getElementById("cursor-dot");
+        const outline = document.getElementById("cursor-outline");
+
+        window.addEventListener("mousemove", (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+            dot.style.left = `${posX}px`;
+            dot.style.top = `${posY}px`;
+            outline.animate({
+                left: `${posX}px`,
+                top: `${posY}px`
+            }, { duration: 500, fill: "forwards" });
+        });
+
+        // Added read-more-btn to hover elements
+        const hoverElements = document.querySelectorAll("button, .gallery-card, .memory-card, .flower-item, .marquee-item, .fav-card, .read-more-btn, .story-card, .memory-box-row");
+        hoverElements.forEach(el => {
+            el.addEventListener("mouseenter", () => {
+                outline.style.width = "60px";
+                outline.style.height = "60px";
+                outline.style.backgroundColor = "rgba(255, 182, 193, 0.15)"; 
+            });
+            el.addEventListener("mouseleave", () => {
+                outline.style.width = "40px";
+                outline.style.height = "40px";
+                outline.style.backgroundColor = "transparent";
+            });
+        });
+
+        // ==========================================
+        // INFINITE MARQUEE LOGIC
+        // ==========================================
+        const marqueeRows = document.querySelectorAll('.marquee-row');
+        marqueeRows.forEach(row => {
+            const originalContent = row.innerHTML;
+            row.innerHTML = originalContent + originalContent; 
+        });
+
+        // ==========================================
+        // SCROLL REVEAL ANIMATION (INTERSECTION OBSERVER)
+        // ==========================================
+        const revealElements = document.querySelectorAll(".reveal");
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("active");
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // ==========================================
+        // 3D TILT EFFECT FOR GALLERY
+        // ==========================================
+        const cards = document.querySelectorAll(".gallery-card");
+        cards.forEach(card => {
+            card.addEventListener("mousemove", (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -15; 
+                const rotateY = ((x - centerX) / centerX) * 15;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                
+                const glare = card.querySelector(".card-glare");
+                glare.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.2), transparent)`;
+            });
+            card.addEventListener("mouseleave", () => {
+                card.style.transform = `perspective(1000px) rotateX(0) rotateY(0)`;
+                const glare = card.querySelector(".card-glare");
+                glare.style.background = `radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1), transparent)`;
+            });
+        });
+
+        // ==========================================
+        // STORY ACCORDION LOGIC
+        // ==========================================
+        function toggleStory(btn) {
+            const storyContent = btn.closest('.story-content');
+            const excerpt = storyContent.querySelector('.story-excerpt');
+            const fullText = storyContent.querySelector('.story-full');
+
+            if (btn.textContent === 'আরও পড়ুন') {
+                // Close all other open stories first
+                document.querySelectorAll('.story-full.active').forEach(activeStory => {
+                    activeStory.classList.remove('active');
+                    activeStory.previousElementSibling.classList.remove('hidden');
+                });
+
+                // Open the clicked one
+                excerpt.classList.add('hidden');
+                fullText.classList.add('active');
+            } else {
+                // Close the current one
+                fullText.classList.remove('active');
+                excerpt.classList.remove('hidden');
+            }
+        }
+
+        // ==========================================
+        // CAT MEOW AUDIO ON GALLERY CLICK
+        // ==========================================
+        const catAudio = new Audio('cat.mp3');
+        let isCatAudioPlaying = false;
+
+        const galleryCards = document.querySelectorAll('.gallery-card');
+        galleryCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if (!isCatAudioPlaying) {
+                    isCatAudioPlaying = true;
+                    catAudio.play().catch(error => {
+                        console.error("Audio playback failed:", error);
+                        isCatAudioPlaying = false;
+                    });
+                }
+            });
+        });
+
+        catAudio.addEventListener('ended', () => {
+            isCatAudioPlaying = false;
+        });
+
+        // ==========================================
+        // MATTER.JS REALISTIC PHYSICS IMPLEMENTATION
+        // ==========================================
+        const Engine = Matter.Engine,
+              Runner = Matter.Runner,
+              Bodies = Matter.Bodies,
+              World = Matter.World,
+              Events = Matter.Events,
+              Body = Matter.Body;
+
+        const engine = Engine.create();
+        engine.world.gravity.y = 0.2; 
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+
+        const canvasContainer = document.getElementById('physics-canvas');
+        const flowerMsg = document.getElementById("flowerMsg");
+
+        const flowerPngs = {
+            lily: '1.png',   
+            rose: '2.png',   
+            jasmine: '3.png' 
+        };
+
+        Events.on(engine, 'beforeUpdate', function() {
+            const bodies = engine.world.bodies;
+            for (let i = 0; i < bodies.length; i++) {
+                let windX = (Math.random() - 0.3) * 0.0005; 
+                let windY = (Math.random() - 0.5) * 0.0001;
+                Body.applyForce(bodies[i], bodies[i].position, { x: windX, y: windY });
+            }
+        });
+
+        Events.on(engine, 'afterUpdate', function() {
+            const bodies = engine.world.bodies;
+            for (let i = 0; i < bodies.length; i++) {
+                let body = bodies[i];
+                if(body.elem) {
+                    body.elem.style.transform = `translate(${body.position.x}px, ${body.position.y}px) rotate(${body.angle}rad)`;
+                    if(body.position.y > window.innerHeight + 50) {
+                        body.elem.remove();
+                        World.remove(engine.world, body);
+                    }
+                }
+            }
+        });
+
+        function spawnFlowers(type) {
+            flowerMsg.style.opacity = "1";
+            const count = Math.floor(Math.random() * 15) + 20; 
+
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    let elem = document.createElement('div');
+                    elem.className = 'physics-flower';
+                    elem.innerHTML = `<img src="${flowerPngs[type]}" alt="flower">`;
+                    
+                    let scale = Math.random() * 0.6 + 0.6; 
+                    elem.style.width = (40 * scale) + 'px';
+                    elem.style.height = (40 * scale) + 'px';
+                    canvasContainer.appendChild(elem);
+
+                    let startX = Math.random() * window.innerWidth;
+                    let startY = -50 - (Math.random() * 100);
+
+                    let body = Bodies.circle(startX, startY, 20 * scale, {
+                        frictionAir: Math.random() * 0.08 + 0.02, 
+                        restitution: 0.5,
+                        density: Math.random() * 0.005 + 0.001,   
+                        angle: Math.random() * Math.PI * 2,        
+                    });
+
+                    body.elem = elem;
+                    Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.2);
+                    World.add(engine.world, body);
+
+                }, i * 150); 
+            }
+        }
+
+        document.querySelectorAll(".flower-item").forEach(item => {
+            item.addEventListener("click", () => {
+                const type = item.getAttribute("data-flower-type");
+                spawnFlowers(type);
+            });
+        });
+
+    </script>
+
+</body>
+</html>
